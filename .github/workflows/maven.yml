@@ -31,7 +31,7 @@ jobs:
         git config --global user.name "Your Name"
         git submodule update --init --recursive
         chmod +777 ./scripts
-        ./scripts/inst.sh --setup
+        ./scripts/inst.sh --setup --fast
         
     - uses: actions/upload-artifact@v2
       with:
