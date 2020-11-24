@@ -31,12 +31,7 @@ jobs:
         git config --global user.name "Your Name"
         git submodule update --init --recursive
         chmod +777 ./scripts
-        cd ./work/
-        rm -r Paper
-        git clone https://github.com/PaperMC/Paper.git -b ver/1.12.2
-        cd ..
-        cd /scripts
-        ./inst.sh --setup
+        ./scripts/inst.sh --setup
         
     - uses: actions/upload-artifact@v2
       with:
