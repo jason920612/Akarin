@@ -34,7 +34,9 @@ jobs:
         cd ./work/
         rm -r Paper
         git clone https://github.com/PaperMC/Paper.git -b ver/1.12.2
-        ./scripts/inst.sh --setup
+        cd ..
+        cd /scripts
+        ./inst.sh --setup
         
     - uses: actions/upload-artifact@v2
       with:
