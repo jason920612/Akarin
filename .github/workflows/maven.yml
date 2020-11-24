@@ -25,12 +25,14 @@ jobs:
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-maven-
 
-    - name: Patch Tuinity
+    - name: Patch Akarin
       run: |
         git config --global user.email "you@example.com"
         git config --global user.name "Your Name"
         git submodule update --init --recursive
         chmod +777 ./scripts
+        cd /work/
+        git clone https://github.com/PaperMC/Paper.git -b ver/1.12.2
         ./scripts/inst.sh --setup
         
     - uses: actions/upload-artifact@v2
