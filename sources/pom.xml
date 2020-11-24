@@ -34,6 +34,13 @@
             <version>4.1.24.Final</version>
             <scope>compile</scope>
         </dependency>
+	    <!-- https://mvnrepository.com/artifact/org.spongepowered/configurate-core -->
+<dependency>
+    <groupId>org.spongepowered</groupId>
+    <artifactId>configurate-core</artifactId>
+    <version>4.0.0</version>
+</dependency>
+
         <dependency>
             <groupId>com.destroystokyo.paper</groupId>
             <artifactId>paper-api</artifactId>
