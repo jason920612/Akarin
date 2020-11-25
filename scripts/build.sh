@@ -27,7 +27,7 @@ fi
 
 echo "[Akarin] Ready to build"
 (
-	cd "$paperworkdir/BuildData" && git checkout "$version"
+	#cd "$paperworkdir/BuildData" && git checkout "$version"
 	cd "$paperbasedir"
 	echo "[Akarin] Touch sources.."
 	
