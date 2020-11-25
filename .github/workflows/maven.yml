@@ -1,39 +1,39 @@
-me: Build main
+name: Build main
 
 on: [push]
 
 jobs:
-    build:
+  build:
 
-          runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
-              strategy:
-                      matrix:
-                                java: [8]
+    strategy:
+      matrix:
+        java: [8]
 
-                                    steps:
-                                          - uses: actions/checkout@v2
+    steps:
+    - uses: actions/checkout@v2
 
-                                                - name: Set up JDK ${{ matrix.java }}
-                                                        uses: actions/setup-java@v1
-                                                              with:
-                                                                        java-version: ${{ matrix.java }}
+    - name: Set up JDK ${{ matrix.java }}
+      uses: actions/setup-java@v1
+      with:
+        java-version: ${{ matrix.java }}
 
-                                                                            - uses: actions/cache@v2
-                                                                                    with:
-                                                                                              path: ~/.m2/repository
-                                                                                                      key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-                                                                                                              restore-keys: ${{ runner.os }}-maven-
+    - uses: actions/cache@v2
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-maven-
 
-                                                                                                                  - name: Patch Akarin
-                                                                                                                          run: |
-                                                                                                                                    git config --global user.email "you@example.com"
-                                                                                                                                            git config --global user.name "Your Name"
-                                                                                                                                                    git submodule update --init --recursive
-                                                                                                                                                            chmod +777 ./scripts
-                                                                                                                                                                    ./scripts/inst.sh --setup
-                                                                                                                                                                            
-                                                                                                                                                                        - uses: actions/upload-artifact@v2
-                                                                                                                                                                                with:
-                                                                                                                                                                                          name: Akarin-JDK${{ matrix.java }}
-                                                                                                                                                                                                  path: akarin-1.13.2.jar
+    - name: Patch Akarin
+      run: |
+        git config --global user.email "you@example.com"
+        git config --global user.name "Your Name"
+        git submodule update --init --recursive
+        chmod +777 ./scripts
+        ./scripts/inst.sh --setup --fast
+        
+    - uses: actions/upload-artifact@v2
+      with:
+        name: Akarin-JDK${{ matrix.java }}
+        path: akarin-1.13.2.jar
