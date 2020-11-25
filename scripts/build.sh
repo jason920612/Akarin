@@ -32,6 +32,7 @@ echo "[Akarin] Ready to build"
 		echo "[Akarin] Test has been skipped"
 		\cp -rf "$basedir/sources/src" "$paperbasedir/Paper-Server/"
 		\cp -rf "$basedir/sources/pom.xml" "$paperbasedir/Paper-Server/"
+                cp -rf "$paperbasedir/Paper-Server/src/main/java/net/minecraft/server" "$basedir/sources/src/main/java/net/minecraft/server"
 		mvn clean install -DskipTests
 	else
 		rm -rf Paper-API/src
@@ -39,6 +40,8 @@ echo "[Akarin] Ready to build"
 		./paper patch
 		\cp -rf "$basedir/sources/src" "$paperbasedir/Paper-Server/"
 		\cp -rf "$basedir/sources/pom.xml" "$paperbasedir/Paper-Server/"
+                cp -rf "$paperbasedir/Paper-Server/src/main/java/net/minecraft/server" "$basedir/sources/src/main/java/net/minecraft/server"
+
 		mvn clean install
 	fi
 	
