@@ -17,7 +17,7 @@ if [ "$2" == "--setup" ] || [ "$3" == "--setup" ] || [ "$4" == "--setup" ]; then
 				rm Minecraft/ -r
 			fi
 			git clone https://github.com/Akarin-project/Minecraft.git
-			cd "Minecraft" && git checkout "$version"
+			
 		fi
 		
 		cd "$paperbasedir"
@@ -27,7 +27,7 @@ fi
 
 echo "[Akarin] Ready to build"
 (
-	#cd "$paperworkdir/BuildData" && git checkout "$version"
+	
 	cd "$paperbasedir"
 	echo "[Akarin] Touch sources.."
 	
