@@ -9,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        java: [11]
+        java: [7]
 
     steps:
     - uses: actions/checkout@v2
