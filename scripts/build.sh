@@ -6,6 +6,10 @@ basedir="$(cd "$1" && pwd -P)"
 workdir="$basedir/work"
 paperbasedir="$basedir/work/Paper"
 paperworkdir="$basedir/work/Paper/work"
+mvn_cmd=("${MVN_CMD:-mvn}")
+if command -v cmd.exe >/dev/null 2>&1 && command -v mvn.cmd >/dev/null 2>&1; then
+	mvn_cmd=(cmd.exe /c mvn)
+fi
 
 if [ "$2" == "--setup" ] || [ "$3" == "--setup" ] || [ "$4" == "--setup" ]; then
 	echo "[Akarin] Setup Paper.."
@@ -32,14 +36,14 @@ echo "[Akarin] Ready to build"
 		echo "[Akarin] Test has been skipped"
 		\cp -rf "$basedir/sources/src" "$paperbasedir/Paper-Server/"
 		\cp -rf "$basedir/sources/pom.xml" "$paperbasedir/Paper-Server/"
-		mvn clean install -DskipTests
+		"${mvn_cmd[@]}" clean install -DskipTests
 	else
 		rm -rf Paper-API/src
 		rm -rf Paper-Server/src
 		./paper patch
 		\cp -rf "$basedir/sources/src" "$paperbasedir/Paper-Server/"
 		\cp -rf "$basedir/sources/pom.xml" "$paperbasedir/Paper-Server/"
-		mvn clean install
+		"${mvn_cmd[@]}" clean install
 	fi
 	
 	minecraftversion=$(cat "$paperworkdir/BuildData/info.json"  | grep minecraftVersion | cut -d '"' -f 4)
