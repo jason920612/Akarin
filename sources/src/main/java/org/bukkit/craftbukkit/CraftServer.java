@@ -896,6 +896,37 @@ public final class CraftServer implements Server {
         return WorldCreator.name(name).environment(environment).seed(seed).generator(generator).createWorld();
     }
 
+    private void prepareSpawnRegion(WorldServer world, String name) {
+        System.out.println("Preparing start region for level " + (console.worlds.indexOf(world)) + " (Seed: " + world.getSeed() + ")");
+
+        if (!world.getWorld().getKeepSpawnInMemory()) {
+            return;
+        }
+
+        short keepLoadedRange = world.paperConfig.keepLoadedRange;
+        long lastLog = System.currentTimeMillis();
+        for (int x = -keepLoadedRange; x <= keepLoadedRange; x += 16) {
+            for (int z = -keepLoadedRange; z <= keepLoadedRange; z += 16) {
+                long now = System.currentTimeMillis();
+
+                if (now < lastLog) {
+                    lastLog = now;
+                }
+
+                if (now > lastLog + 1000L) {
+                    int total = (keepLoadedRange * 2 + 1) * (keepLoadedRange * 2 + 1);
+                    int prepared = (x + keepLoadedRange) * (keepLoadedRange * 2 + 1) + z + 1;
+
+                    System.out.println("Preparing spawn area for " + name + ", " + (prepared * 100 / total) + "%");
+                    lastLog = now;
+                }
+
+                BlockPosition spawn = world.getSpawn();
+                world.getChunkProviderServer().getChunkAt(spawn.getX() + x >> 4, spawn.getZ() + z >> 4);
+            }
+        }
+    }
+
     @Override
     public World createWorld(WorldCreator creator) {
         Validate.notNull(creator, "Creator may not be null");
@@ -977,33 +1008,18 @@ public final class CraftServer implements Server {
         internal.worldData.setDifficulty(EnumDifficulty.EASY);
         internal.setSpawnFlags(true, true);
         console.worlds.add(internal);
+        if (io.akarin.server.core.AkarinGlobalConfig.parallelWorldEnabled) {
+            io.akarin.server.parallel.WorldThreadingManager.bindWorld(internal);
+        }
 
         pluginManager.callEvent(new WorldInitEvent(internal.getWorld()));
-        System.out.println("Preparing start region for level " + (console.worlds.size() - 1) + " (Seed: " + internal.getSeed() + ")");
-
-        if (internal.getWorld().getKeepSpawnInMemory()) {
-            short short1 = internal.paperConfig.keepLoadedRange; // Paper
-            long i = System.currentTimeMillis();
-            for (int j = -short1; j <= short1; j += 16) {
-                for (int k = -short1; k <= short1; k += 16) {
-                    long l = System.currentTimeMillis();
-
-                    if (l < i) {
-                        i = l;
-                    }
-
-                    if (l > i + 1000L) {
-                        int i1 = (short1 * 2 + 1) * (short1 * 2 + 1);
-                        int j1 = (j + short1) * (short1 * 2 + 1) + k + 1;
-
-                        System.out.println("Preparing spawn area for " + name + ", " + (j1 * 100 / i1) + "%");
-                        i = l;
-                    }
-
-                    BlockPosition chunkcoordinates = internal.getSpawn();
-                    internal.getChunkProviderServer().getChunkAt(chunkcoordinates.getX() + j >> 4, chunkcoordinates.getZ() + k >> 4);
-                }
-            }
+        if (io.akarin.server.core.AkarinGlobalConfig.parallelWorldEnabled) {
+            io.akarin.server.parallel.WorldThreadingManager.callSync(internal, () -> {
+                prepareSpawnRegion(internal, name);
+                return null;
+            });
+        } else {
+            prepareSpawnRegion(internal, name);
         }
         pluginManager.callEvent(new WorldLoadEvent(internal.getWorld()));
         return internal.getWorld();
@@ -1052,6 +1068,9 @@ public final class CraftServer implements Server {
 
         worlds.remove(world.getName().toLowerCase(java.util.Locale.ENGLISH));
         console.worlds.remove(console.worlds.indexOf(handle));
+        if (io.akarin.server.core.AkarinGlobalConfig.parallelWorldEnabled) {
+            io.akarin.server.parallel.WorldThreadingManager.unbindWorld(handle);
+        }
 
         File parentFolder = world.getWorldFolder().getAbsoluteFile();
 

@@ -37,6 +37,23 @@ public final class WorldThreadingManager {
         }
     }
 
+    public static void unbindWorld(WorldServer world) {
+        if (!AkarinGlobalConfig.parallelWorldEnabled) {
+            return;
+        }
+        WorldTickExecutor executor = EXECUTORS.remove(world);
+        if (executor == null) {
+            return;
+        }
+        executor.shutdown();
+        try {
+            executor.awaitShutdown(5000L);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            Akari.logger.warn("Interrupted while waiting for {} to stop", executor.getOwnerThread().getName(), ex);
+        }
+    }
+
     public static void shutdownAll() {
         for (WorldTickExecutor executor : EXECUTORS.values()) {
             executor.shutdown();

@@ -128,16 +128,46 @@ public abstract class MixinMinecraftServer {
             }
         }
     }
+
+    private void prepareChunksParallelOwned() throws InterruptedException, ExecutionException {
+        if (cachedWorldSize != worlds.size()) {
+            cachedWorldSize = worlds.size();
+        }
+        WorldThreadingManager.bindWorlds(worlds);
+
+        java.util.ArrayList<WorldServer> preparedWorlds = new java.util.ArrayList<>(worlds.size());
+        java.util.ArrayList<FutureTask<Void>> futures = new java.util.ArrayList<>(worlds.size());
+
+        for (int index = 0; index < worlds.size(); index++) {
+            WorldServer world = this.worlds.get(index);
+            if (!world.getWorld().getKeepSpawnInMemory()) {
+                continue;
+            }
+
+            final int worldIndex = index;
+            preparedWorlds.add(world);
+            futures.add(WorldThreadingManager.execute(world, () -> prepareChunks(world, worldIndex)));
+        }
+
+        for (int i = 0; i < preparedWorlds.size(); ++i) {
+            waitForWorldFuture(preparedWorlds.get(i), futures.get(i));
+        }
+    }
     
     @Overwrite
     protected void l() throws InterruptedException {
         if (AkarinGlobalConfig.parallelWorldEnabled) {
-            for (int index = 0; index < worlds.size(); index++) {
-                WorldServer world = this.worlds.get(index);
-                if (!world.getWorld().getKeepSpawnInMemory()) {
-                    continue;
+            try {
+                prepareChunksParallelOwned();
+            } catch (ExecutionException ex) {
+                Throwable cause = ex.getCause();
+                if (cause instanceof RuntimeException) {
+                    throw (RuntimeException) cause;
                 }
-                prepareChunks(world, index);
+                if (cause instanceof Error) {
+                    throw (Error) cause;
+                }
+                throw new RuntimeException("Exception preparing world spawn regions", cause);
             }
             if (WorldLoadEvent.getHandlerList().getRegisteredListeners().length != 0) {
                 for (WorldServer world : this.worlds) {
