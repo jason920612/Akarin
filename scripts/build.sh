@@ -47,7 +47,7 @@ echo "[Akarin] Ready to build"
 		"${mvn_cmd[@]}" clean install
 	fi
 	
-	minecraftversion=$(cat "$paperworkdir/BuildData/info.json"  | grep minecraftVersion | cut -d '"' -f 4)
+	minecraftversion=$(grep -m1 '<minecraft.version>' "$basedir/sources/pom.xml" | cut -d '>' -f 2 | cut -d '<' -f 1)
 	rawjar="$paperbasedir/Paper-Server/target/akarin-$minecraftversion.jar"
 	\cp -rf "$rawjar" "$basedir/akarin-$minecraftversion.jar"
 	

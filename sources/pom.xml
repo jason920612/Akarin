@@ -3,14 +3,15 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>akarin</artifactId>
     <packaging>jar</packaging>
-    <version>1.12.2-R0.4-SNAPSHOT</version>
+    <version>26.1.2-R0.4-SNAPSHOT</version>
     <name>Akarin</name>
     <url>https://github.com/Akarin-project/Akarin</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <api.version>1.12.2-R0.1-SNAPSHOT</api.version>
-        <minecraft.version>1.12.2</minecraft.version>
+        <api.version>26.1.2-R0.1-SNAPSHOT</api.version>
+        <minecraft.version>26.1.2</minecraft.version>
+        <minecraft.upstream.version>1.12.2</minecraft.upstream.version>
         <minecraft_version>1_12_R1</minecraft_version>
         <buildtag.prefix>git-Bukkit-</buildtag.prefix>
         <buildtag.suffix></buildtag.suffix>
@@ -42,7 +43,7 @@
         <dependency>
             <groupId>com.destroystokyo.paper</groupId>
             <artifactId>paper</artifactId>
-            <version>${minecraft.version}-R0.1-SNAPSHOT</version>
+            <version>${minecraft.upstream.version}-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
