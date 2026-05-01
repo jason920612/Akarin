@@ -167,8 +167,8 @@
             <url>https://repo.spongepowered.org/maven/</url>
         </repository>
         <repository>
-            <id>nallar-repo</id>
-            <url>http://repo.nallar.me/</url>
+            <id>josephworks</id>
+            <url>https://repo.josephworks.net/repository/maven-public/</url>
         </repository>
     </repositories>
 

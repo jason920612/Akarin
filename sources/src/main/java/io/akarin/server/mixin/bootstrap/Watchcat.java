@@ -22,10 +22,8 @@ import net.minecraft.server.MinecraftServer;
 public abstract class Watchcat extends Thread {
     @Shadow private static WatchdogThread instance;
     @Shadow private @Final long timeoutTime;
-    @Shadow private @Final long earlyWarningEvery; // Paper - Timeout time for just printing a dump but not restarting
-    @Shadow private @Final long earlyWarningDelay; // Paper
-    @Shadow public static volatile boolean hasStarted; // Paper
-    @Shadow private long lastEarlyWarning; // Paper - Keep track of short dump times to avoid spamming console with short dumps
+    @Shadow private @Final long shortTimeout; // Paper - Timeout time for just printing a dump but not restarting
+    @Shadow private long lastShortDump; // Paper - Keep track of short dump times to avoid spamming console with short dumps
     @Shadow private @Final boolean restart;
     @Shadow private volatile long lastTick;
     @Shadow private volatile boolean stopping;
@@ -43,13 +41,13 @@ public abstract class Watchcat extends Thread {
         while (!stopping) {
             // Paper start
             long currentTime = System.currentTimeMillis();
-            if ( lastTick != 0 && currentTime > lastTick + earlyWarningEvery && !Boolean.getBoolean("disable.watchdog") )
+            if ( lastTick != 0 && currentTime > lastTick + shortTimeout && !Boolean.getBoolean("disable.watchdog") )
             {
                 boolean isLongTimeout = currentTime > lastTick + timeoutTime;
                 // Don't spam early warning dumps
-                if (!isLongTimeout && (earlyWarningEvery <= 0 || !hasStarted || currentTime < lastEarlyWarning + earlyWarningEvery || currentTime < lastTick + earlyWarningDelay))
+                if (!isLongTimeout && currentTime < lastShortDump + shortTimeout)
                     continue;
-                lastEarlyWarning = currentTime;
+                lastShortDump = currentTime;
                 // Paper end
                 Logger log = Bukkit.getServer().getLogger();
                 // Paper start - Different message when it's a short timeout
