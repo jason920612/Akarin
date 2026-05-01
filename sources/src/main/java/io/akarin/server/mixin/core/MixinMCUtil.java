@@ -16,7 +16,7 @@ import net.minecraft.server.MinecraftServer;
 public abstract class MixinMCUtil {
     @Overwrite
     public static <T> T ensureMain(String reason, Supplier<T> run) {
-        if (AsyncCatcher.enabled && !Akari.isPrimaryThread()) {
+        if (AsyncCatcher.enabled && !Akari.isTickThread()) {
             new IllegalStateException("Asynchronous " + reason + "! Blocking thread until it returns ").printStackTrace();
             Waitable<T> wait = new Waitable<T>() {
                 @Override

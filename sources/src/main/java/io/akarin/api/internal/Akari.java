@@ -23,6 +23,7 @@ import io.akarin.api.internal.utils.ReentrantSpinningLock;
 import io.akarin.api.internal.utils.thread.SuspendableExecutorCompletionService;
 import io.akarin.api.internal.utils.thread.SuspendableThreadPoolExecutor;
 import io.akarin.server.core.AkarinGlobalConfig;
+import io.akarin.server.parallel.WorldThreadingManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.World;
 import net.minecraft.server.WorldServer;
@@ -114,7 +115,25 @@ public abstract class Akari {
     
     public static boolean isPrimaryThread(boolean assign) {
         Thread current = Thread.currentThread();
+        if (AkarinGlobalConfig.parallelWorldEnabled) {
+            return current == MinecraftServer.getServer().primaryThread;
+        }
         return current == MinecraftServer.getServer().primaryThread || (assign ? (current.getClass() == AssignableThread.class) : false);
+    }
+
+    public static boolean isWorldThread(WorldServer world) {
+        return WorldThreadingManager.isWorldThread(world);
+    }
+
+    public static void ensureWorldThread(WorldServer world) {
+        WorldThreadingManager.ensureWorldThread(world);
+    }
+
+    public static boolean isTickThread() {
+        if (isPrimaryThread(false)) {
+            return true;
+        }
+        return WorldThreadingManager.isWorldThread(Thread.currentThread());
     }
     
     public static final String EMPTY_STRING = "";

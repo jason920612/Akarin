@@ -257,4 +257,19 @@ public class AkarinGlobalConfig {
     private static void parallelMode() {
         parallelMode = getInt("core.parallel-mode", 1);
     }
+
+    public static boolean parallelWorldEnabled;
+    private static void parallelWorldEnabled() {
+        parallelWorldEnabled = getBoolean("core.parallel-world.enabled", Boolean.getBoolean("akarin.parallelWorld"));
+    }
+
+    public static boolean parallelWorldDebugLog;
+    private static void parallelWorldDebugLog() {
+        parallelWorldDebugLog = getBoolean("core.parallel-world.debug-log", false);
+    }
+
+    public static long parallelWorldTaskTimeout;
+    private static void parallelWorldTaskTimeout() {
+        parallelWorldTaskTimeout = getSeconds(getString("core.parallel-world.task-timeout", "30s")) * 1000L;
+    }
 }

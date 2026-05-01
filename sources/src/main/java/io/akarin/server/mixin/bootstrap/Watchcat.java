@@ -16,6 +16,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import io.akarin.server.core.AkarinGlobalConfig;
+import io.akarin.server.parallel.WorldThreadingManager;
 import net.minecraft.server.MinecraftServer;
 
 @Mixin(value = WatchdogThread.class, remap = false)
@@ -81,6 +83,16 @@ public abstract class Watchcat extends Thread {
                 log.log(Level.SEVERE, "------------------------------");
                 log.log(Level.SEVERE, "Server thread dump (Look for plugins here before reporting to Akarin!):");
                 dumpThread(ManagementFactory.getThreadMXBean().getThreadInfo(MinecraftServer.getServer().primaryThread.getId(), Integer.MAX_VALUE), log);
+                if (AkarinGlobalConfig.parallelWorldEnabled) {
+                    log.log(Level.SEVERE, "------------------------------");
+                    log.log(Level.SEVERE, "Parallel world thread dump:");
+                    for (io.akarin.server.parallel.WorldTickExecutor executor : WorldThreadingManager.executors()) {
+                        log.log(Level.SEVERE, WorldThreadingManager.describeExecutor(executor));
+                    }
+                    for (ThreadInfo thread : WorldThreadingManager.dumpThreadInfos()) {
+                        dumpThread(thread, log);
+                    }
+                }
                 log.log(Level.SEVERE, "------------------------------");
                 //
                 // Paper start - Only print full dump on long timeouts

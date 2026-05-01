@@ -15,7 +15,7 @@ public abstract class MixinAsyncCatcher {
     @Overwrite
     public static void catchOp(String reason) {
         if (enabled) {
-            if (Akari.isPrimaryThread()) return;
+            if (Akari.isTickThread()) return;
             
             if (AkarinGlobalConfig.throwOnAsyncCaught) {
                 throw new IllegalStateException("Asynchronous " + reason + "!");
